@@ -1,0 +1,342 @@
+tap 1.2TOIv2
+
+
+tanzu tap 1.2 doc:
+https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-intro.html
+
+prerequisites:
+https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-prerequisites.html
+
+troubleshooting tap installation:
+https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html
+
+lab url:
+http://support-lab-status.cfapps-01.slot-34.tanzu-gss-labs.vmware.com/
+
+jumpbox: 
+opsmgr-23.slot-35.tanzu-gss-labs.vmware.com
+ssh -o StrictHostKeyChecking=no -i <DOWNLOAD SSH KEY> ubuntu@opsmgr-23.slot-35.tanzu-gss-labs.vmware.com
+
+lab pipeline:
+https://concourse.vsphere.tanzu-gss-labs.vmware.com/teams/support/pipelines/slot35-lab23
+
+tools, cli version details:
+ubuntu@jumpbox:~$ tanzu version
+version: v0.25.0
+ubuntu@jumpbox:~$ kubectl version
+Client Version: version.Info{Major:"1", Minor:"25", GitVersion:"v1.25.2", GitCommit:"5835544ca568b757a8ecae5c153f317e5736700e", GitTreeState:"clean", BuildDate:"2022-09-22T02:38:06Z", GoVersion:"go1.19", Compiler:"gc", Platform:"linux/amd64"}
+Server Version: version.Info{Major:"1", Minor:"23", GitVersion:"v1.23.8+vmware.2", GitCommit:"d625665700d901401d7504761cf473dd8adfc7b3", GitTreeState:"clean", BuildDate:"2022-07-18T23:04:08Z", GoVersion:"go1.17.11", Compiler:"gc", Platform:"linux/amd64"}
+
+
+tanzu package installed:
+ubuntu@jumpbox:~$ tanzu package installed list -A
+  NAME                  PACKAGE-NAME                           PACKAGE-VERSION        STATUS               NAMESPACE
+  cert-manager          cert-manager.tanzu.vmware.com          1.7.2+vmware.1-tkg.1   Reconcile succeeded  cert-manager
+  antrea                antrea.tanzu.vmware.com                1.5.3+tkg.1-advanced   Reconcile succeeded  tkg-system
+  metrics-server        metrics-server.tanzu.vmware.com        0.6.1+vmware.1-tkg.1   Reconcile succeeded  tkg-system
+  secretgen-controller  secretgen-controller.tanzu.vmware.com  0.9.1+vmware.1-tkg.1   Reconcile succeeded  tkg-system
+  vsphere-cpi           vsphere-cpi.tanzu.vmware.com           1.23.1+vmware.1-tkg.1  Reconcile succeeded  tkg-system
+  vsphere-csi           vsphere-csi.tanzu.vmware.com           2.5.2+vmware.1-tkg.1   Reconcile succeeded  tkg-system
+
+
+ubuntu@jumpbox:~$ tanzu package available list
+
+  NAME                                          DISPLAY-NAME               SHORT-DESCRIPTION                                                                 LATEST-VERSION
+  cert-manager.tanzu.vmware.com                 cert-manager               Certificate management                                                            1.7.2+vmware.1-tkg.1
+  contour.tanzu.vmware.com                      contour                    An ingress controller                                                             1.20.2+vmware.1-tkg.1
+  external-dns.tanzu.vmware.com                 external-dns               This package provides DNS synchronization functionality.                          0.11.0+vmware.1-tkg.2
+  fluent-bit.tanzu.vmware.com                   fluent-bit                 Fluent Bit is a fast Log Processor and Forwarder                                  1.8.15+vmware.1-tkg.1
+  fluxcd-helm-controller.tanzu.vmware.com       Flux Helm Controller       Helm controller is one of the components in FluxCD GitOps toolkit.                0.21.0+vmware.1-tkg.1
+  fluxcd-kustomize-controller.tanzu.vmware.com  Flux Kustomize Controller  Kustomize controller is one of the components in Fluxcd GitOps toolkit.           0.24.4+vmware.1-tkg.1
+  fluxcd-source-controller.tanzu.vmware.com     Flux Source Controller     The source-controller is a Kubernetes operator, specialised in artifacts          0.24.4+vmware.1-tkg.4
+                                                                           acquisition from external sources such as Git, Helm repositories and S3 buckets.
+  grafana.tanzu.vmware.com                      grafana                    Visualization and analytics software                                              7.5.16+vmware.1-tkg.1
+  harbor.tanzu.vmware.com                       harbor                     OCI Registry                                                                      2.5.3+vmware.1-tkg.1
+  multus-cni.tanzu.vmware.com                   multus-cni                 This package provides the ability for enabling attaching multiple network         3.8.0+vmware.1-tkg.1
+                                                                           interfaces to pods in Kubernetes
+  prometheus.tanzu.vmware.com                   prometheus                 A time series database for your metrics                                           2.36.2+vmware.1-tkg.1
+  whereabouts.tanzu.vmware.com                  whereabouts                A CNI IPAM plugin that assigns IP addresses cluster-wide                          0.5.1+vmware.2-tkg.1
+
+
+ubuntu@jumpbox:~$ kubectl config use-context workload-slot35rp23-admin@workload-slot35rp23
+Switched to context "workload-slot35rp23-admin@workload-slot35rp23".
+
+ubuntu@jumpbox:~$ kubectl config get-contexts
+CURRENT   NAME                                            CLUSTER               AUTHINFO                    NAMESPACE
+          mgmt-slot35rp23-admin@mgmt-slot35rp23           mgmt-slot35rp23       mgmt-slot35rp23-admin
+*         workload-slot35rp23-admin@workload-slot35rp23   workload-slot35rp23   workload-slot35rp23-admin
+
+
+
+Install/Update Tanzu CLI plug-ins
+  ubuntu@jumpbox:~$ tanzu plugin list
+  NAME                DESCRIPTION                                                        SCOPE       DISCOVERY                VERSION  STATUS
+  cluster             Kubernetes cluster operations                                      Context     default-mgmt-slot35rp23  v0.25.0  installed
+  feature             Operate on features and featuregates                               Context     default-mgmt-slot35rp23  v0.25.0  installed
+  kubernetes-release  Kubernetes release operations                                      Context     default-mgmt-slot35rp23  v0.25.0  installed
+  login               Login to the platform                                              Standalone  default                  v0.25.0  installed
+  management-cluster  Kubernetes management-cluster operations                           Standalone  default                  v0.25.0  installed
+  package             Tanzu package management                                           Standalone  default                  v0.25.0  installed
+  pinniped-auth       Pinniped authentication operations (usually not directly invoked)  Standalone  default                  v0.25.0  installed
+  secret              Tanzu secret management                                            Standalone  default                  v0.25.0  installed
+  telemetry           Configure cluster-wide telemetry settings                          Standalone  default                  v0.25.0  installed
+
+
+clusters config:
+ubuntu@jumpbox:~$ kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://10.225.59.138:6443
+  name: mgmt-slot35rp23
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://10.225.59.137:6443
+  name: workload-slot35rp23
+contexts:
+- context:
+    cluster: mgmt-slot35rp23
+    user: mgmt-slot35rp23-admin
+  name: mgmt-slot35rp23-admin@mgmt-slot35rp23
+- context:
+    cluster: workload-slot35rp23
+    user: workload-slot35rp23-admin
+  name: workload-slot35rp23-admin@workload-slot35rp23
+current-context: workload-slot35rp23-admin@workload-slot35rp23
+kind: Config
+preferences: {}
+users:
+- name: mgmt-slot35rp23-admin
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+- name: workload-slot35rp23-admin
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+
+Relocate images to a registry:
+ubuntu@jumpbox:~$ docker login demo.goharbor.io
+Username: jairotest
+Password:PaPa0811!
+
+manually create a new project:
+create new project > mitest
+
+ubuntu@jumpbox:~$ docker login registry.tanzu.vmware.com
+Username: jpastrana@pivotal.io
+Password:PaPa0811!
+
+
+export INSTALL_REGISTRY_USERNAME=jairop
+export INSTALL_REGISTRY_PASSWORD='9D4CHd@aQ"):%Xn'
+export INSTALL_REGISTRY_HOSTNAME=harbor-repo.vmware.com
+export TAP_VERSION=1.2.2
+export INSTALL_REPO=jairotest/repo
+
+
+
+ubuntu@jumpbox:~$ imgpkg copy -b registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:${TAP_VERSION} --to-repo ${INSTALL_REGISTRY_HOSTNAME}/${INSTALL_REPO}/tap-packages
+copy | exporting 177 images...
+copy | will export registry.tanzu.vmware.com/tanzu-application-platform/tap-packages@sha256:fdf4eca1d730c92a6b81700eb0156ac67dc700ed09d7dcb4dd909a75f0914c0b
+copy | exported 177 images
+copy | importing 177 images...
+
+6.74 GiB / 6.74 GiB [------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>] 99.95% 23.97 MiB p/s
+copy |
+copy | done uploading images
+copy | Warning: Skipped layer due to it being non-distributable. If you would like to include non-distributable layers, use the --include-non-distributable-layers flag
+
+
+Create a namespace called tap-install for deploying any component packages:
+ubuntu@jumpbox:~$ kubectl create ns tap-install
+namespace/tap-install created
+
+ubuntu@jumpbox:~$ kubectl get ns
+
+NAME                        STATUS   AGE
+cert-manager                Active   2d13h
+default                     Active   2d13h
+kube-node-lease             Active   2d13h
+kube-public                 Active   2d13h
+kube-system                 Active   2d13h
+metallb-system              Active   2d13h
+tanzu-package-repo-global   Active   2d13h
+tanzu-system                Active   2d13h
+tap-install                 Active   2m9s
+tkg-system                  Active   2d13h
+tkg-system-public           Active   2d13h
+
+
+Create a registry secret:
+ubuntu@jumpbox:~$ tanzu secret registry add tap-registry --username ${INSTALL_REGISTRY_USERNAME} --password ${INSTALL_REGISTRY_PASSWORD}  --server ${INSTALL_REGISTRY_HOSTNAME} --export-to-all-namespaces --yes --namespace tap-install
+Warning: By choosing --export-to-all-namespaces, given secret contents will be available to ALL users in ALL namespaces. Please ensure that included registry credentials allow only read-only access to the registry with minimal necessary scope.
+| Adding registry secret 'tap-registry'...
+ Added registry secret 'tap-registry' into namespace 'tap-install'
+ Exported registry secret 'tap-registry' to all namespaces
+
+
+Add the Tanzu Application Platform package repository to the cluster:
+ ubuntu@jumpbox:~$ tanzu package repository add tanzu-tap-repository --url ${INSTALL_REGISTRY_HOSTNAME}/${INSTALL_REPO}/tap-packages:$TAP_VERSION --namespace tap-install
+
+ Adding package repository 'tanzu-tap-repository'
+ Validating provided settings for the package repository
+ Creating package repository resource
+ Waiting for 'PackageRepository' reconciliation for 'tanzu-tap-repository'
+ 'PackageRepository' resource install status: Reconciling
+ 'PackageRepository' resource install status: ReconcileSucceeded
+Added package repository 'tanzu-tap-repository' in namespace 'tap-install'
+
+Get the status of the Tanzu Application Platform package repository, and ensure the status updates to Reconcile succeeded:
+ubuntu@jumpbox:~$ tanzu package repository get tanzu-tap-repository --namespace tap-install
+
+NAME:          tanzu-tap-repository
+VERSION:       996000
+REPOSITORY:    demo.goharbor.io/mitest/repo/tap-packages
+TAG:           1.2.2
+STATUS:        Reconcile succeeded
+REASON:
+
+List the available packages:
+
+
+  NAME                                                 DISPLAY-NAME                                                              SHORT-DESCRIPTION                                                                 LATEST-VERSION
+  cert-manager.tanzu.vmware.com                        cert-manager                                                              Certificate management                                                            1.7.2+vmware.1-tkg.1
+  contour.tanzu.vmware.com                             contour                                                                   An ingress controller                                                             1.20.2+vmware.1-tkg.1
+  external-dns.tanzu.vmware.com                        external-dns                                                              This package provides DNS synchronization functionality.                          0.11.0+vmware.1-tkg.2
+  fluent-bit.tanzu.vmware.com                          fluent-bit                                                                Fluent Bit is a fast Log Processor and Forwarder                                  1.8.15+vmware.1-tkg.1
+  fluxcd-helm-controller.tanzu.vmware.com              Flux Helm Controller                                                      Helm controller is one of the components in FluxCD GitOps toolkit.                0.21.0+vmware.1-tkg.1
+  fluxcd-kustomize-controller.tanzu.vmware.com         Flux Kustomize Controller                                                 Kustomize controller is one of the components in Fluxcd GitOps toolkit.           0.24.4+vmware.1-tkg.1
+  fluxcd-source-controller.tanzu.vmware.com            Flux Source Controller                                                    The source-controller is a Kubernetes operator, specialised in artifacts          0.24.4+vmware.1-tkg.4
+                                                                                                                                 acquisition from external sources such as Git, Helm repositories and S3 buckets.
+  grafana.tanzu.vmware.com                             grafana                                                                   Visualization and analytics software                                              7.5.16+vmware.1-tkg.1
+  harbor.tanzu.vmware.com                              harbor                                                                    OCI Registry                                                                      2.5.3+vmware.1-tkg.1
+  multus-cni.tanzu.vmware.com                          multus-cni                                                                This package provides the ability for enabling attaching multiple network         3.8.0+vmware.1-tkg.1
+                                                                                                                                 interfaces to pods in Kubernetes
+  prometheus.tanzu.vmware.com                          prometheus                                                                A time series database for your metrics                                           2.36.2+vmware.1-tkg.1
+  whereabouts.tanzu.vmware.com                         whereabouts                                                               A CNI IPAM plugin that assigns IP addresses cluster-wide                          0.5.1+vmware.2-tkg.1
+  accelerator.apps.tanzu.vmware.com                    Application Accelerator for VMware Tanzu                                  Used to create new projects and configurations.                                   1.2.2
+  api-portal.tanzu.vmware.com                          API portal                                                                A unified user interface to enable search, discovery and try-out of API           1.0.26
+                                                                                                                                 endpoints at ease.
+  backend.appliveview.tanzu.vmware.com                 Application Live View for VMware Tanzu                                    App for monitoring and troubleshooting running apps                               1.2.1
+  build.appliveview.tanzu.vmware.com                   Application Live View Conventions for VMware Tanzu                        Application Live View convention server                                           1.0.2
+  buildservice.tanzu.vmware.com                        Tanzu Build Service                                                       Tanzu Build Service enables the building and automation of containerized          1.6.3
+                                                                                                                                 software workflows securely and at scale.
+  cartographer.tanzu.vmware.com                        Cartographer                                                              Kubernetes native Supply Chain Choreographer.                                     0.4.3
+  cnrs.tanzu.vmware.com                                Cloud Native Runtimes                                                     Cloud Native Runtimes is a serverless runtime based on Knative                    1.3.0
+  connector.appliveview.tanzu.vmware.com               Application Live View Connector for VMware Tanzu                          App for discovering and registering running apps                                  1.2.1
+  controller.conventions.apps.tanzu.vmware.com         Convention Service for VMware Tanzu                                       Convention Service enables app operators to consistently apply desired runtime    0.7.0
+                                                                                                                                 configurations to fleets of workloads.
+  controller.source.apps.tanzu.vmware.com              Tanzu Source Controller                                                   Tanzu Source Controller enables workload create/update from source code.          0.4.1
+  conventions.appliveview.tanzu.vmware.com             Application Live View Conventions for VMware Tanzu                        Application Live View convention server                                           1.2.1
+  developer-conventions.tanzu.vmware.com               Tanzu App Platform Developer Conventions                                  Developer Conventions                                                             0.7.0
+  fluxcd.source.controller.tanzu.vmware.com            Flux Source Controller                                                    The source-controller is a Kubernetes operator, specialised in artifacts          0.16.4
+                                                                                                                                 acquisition from external sources such as Git, Helm repositories and S3 buckets.
+  grype.scanning.apps.tanzu.vmware.com                 Grype for Supply Chain Security Tools - Scan                              Default scan templates using Anchore Grype                                        1.2.3
+  image-policy-webhook.signing.apps.tanzu.vmware.com   Image Policy Webhook                                                      Image Policy Webhook enables defining of a policy to restrict unsigned container  1.1.5
+                                                                                                                                 images.
+  learningcenter.tanzu.vmware.com                      Learning Center for Tanzu Application Platform                            Guided technical workshops                                                        0.2.2
+  metadata-store.apps.tanzu.vmware.com                 Supply Chain Security Tools - Store                                       Post SBoMs and query for image, package, and vulnerability metadata.              1.2.4
+  ootb-delivery-basic.tanzu.vmware.com                 Tanzu App Platform Out of The Box Delivery Basic                          Out of The Box Delivery Basic.                                                    0.8.1
+  ootb-supply-chain-basic.tanzu.vmware.com             Tanzu App Platform Out of The Box Supply Chain Basic                      Out of The Box Supply Chain Basic.                                                0.8.1
+  ootb-supply-chain-testing-scanning.tanzu.vmware.com  Tanzu App Platform Out of The Box Supply Chain with Testing and Scanning  Out of The Box Supply Chain with Testing and Scanning.                            0.8.1
+  ootb-supply-chain-testing.tanzu.vmware.com           Tanzu App Platform Out of The Box Supply Chain with Testing               Out of The Box Supply Chain with Testing.                                         0.8.1
+  ootb-templates.tanzu.vmware.com                      Tanzu App Platform Out of The Box Templates                               Out of The Box Templates.                                                         0.8.1
+  policy.apps.tanzu.vmware.com                         Supply Chain Security Tools - Policy Controller                           Policy Controller enables defining of a policy to restrict unsigned container     1.0.1
+                                                                                                                                 images.
+  scanning.apps.tanzu.vmware.com                       Supply Chain Security Tools - Scan                                        Scan for vulnerabilities and enforce policies directly within Kubernetes native   1.2.3
+                                                                                                                                 Supply Chains.
+  service-bindings.labs.vmware.com                     Service Bindings for Kubernetes                                           Service Bindings for Kubernetes implements the Service Binding Specification.     0.7.2
+  services-toolkit.tanzu.vmware.com                    Services Toolkit                                                          The Services Toolkit enables the management, lifecycle, discoverability and       0.7.1
+                                                                                                                                 connectivity of Service Resources (databases, message queues, DNS records,
+                                                                                                                                 etc.).
+  snyk.scanning.apps.tanzu.vmware.com                  Snyk for Supply Chain Security Tools - Scan                               Default scan templates using Snyk                                                 1.0.0-beta.3
+  spring-boot-conventions.tanzu.vmware.com             Tanzu Spring Boot Conventions Server                                      Default Spring Boot convention server.                                            0.4.1
+  sso.apps.tanzu.vmware.com                            AppSSO                                                                    Application Single Sign-On for Tanzu                                              1.0.0
+  tap-auth.tanzu.vmware.com                            Default roles for Tanzu Application Platform                              Default roles for Tanzu Application Platform                                      1.0.1
+  tap-gui.tanzu.vmware.com                             Tanzu Application Platform GUI                                            web app graphical user interface for Tanzu Application Platform                   1.2.5
+  tap-telemetry.tanzu.vmware.com                       Telemetry Collector for Tanzu Application Platform                        Tanzu Application Plaform Telemetry                                               0.2.1
+  tap.tanzu.vmware.com                                 Tanzu Application Platform                                                Package to install a set of TAP components to get you started based on your use   1.2.2
+                                                                                                                                 case.
+  tekton.tanzu.vmware.com                              Tekton Pipelines                                                          Tekton Pipelines is a framework for creating CI/CD systems.                       0.33.5
+  workshops.learningcenter.tanzu.vmware.com            Workshop Building Tutorial                                                Workshop Building Tutorial                                                        0.2.2
+
+
+
+
+Install your Tanzu Application Platform profile
+To prepare to install a profile,List version information for the package by running:
+  ubuntu@jumpbox:~$ tanzu package available list tap.tanzu.vmware.com --namespace tap-install
+
+  NAME                  VERSION  RELEASED-AT
+  tap.tanzu.vmware.com  1.2.2    2022-09-11 00:00:00 +0000 UTC
+
+
+tanzu package install tap -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file tap-values.yaml -n tap-install
+ Installing package 'tap.tanzu.vmware.com'
+ Getting package metadata for 'tap.tanzu.vmware.com'
+ Creating service account 'tap-tap-install-sa'
+ Creating cluster admin role 'tap-tap-install-cluster-role'
+ Creating cluster role binding 'tap-tap-install-cluster-rolebinding'
+ Creating secret 'tap-tap-install-values'
+ Creating package resource
+ Waiting for 'PackageInstall' reconciliation for 'tap'
+ 'PackageInstall' resource install status: Reconciling
+ 'PackageInstall' resource install status: ReconcileSucceeded
+
+ Added installed package 'tap'
+
+ ubuntu@jumpbox:~$ tanzu package installed list -A
+
+  NAME                      PACKAGE-NAME                                        PACKAGE-VERSION        STATUS               NAMESPACE
+  accelerator               accelerator.apps.tanzu.vmware.com                   1.2.2                  Reconcile succeeded  tap-install
+  api-portal                api-portal.tanzu.vmware.com                         1.0.26                 Reconcile succeeded  tap-install
+  appliveview               backend.appliveview.tanzu.vmware.com                1.2.1                  Reconcile succeeded  tap-install
+  appliveview-connector     connector.appliveview.tanzu.vmware.com              1.2.1                  Reconcile succeeded  tap-install
+  appliveview-conventions   conventions.appliveview.tanzu.vmware.com            1.2.1                  Reconcile succeeded  tap-install
+  appsso                    sso.apps.tanzu.vmware.com                           1.0.0                  Reconcile succeeded  tap-install
+  buildservice              buildservice.tanzu.vmware.com                       1.6.3                  Reconcile succeeded  tap-install
+  cartographer              cartographer.tanzu.vmware.com                       0.4.3                  Reconcile succeeded  tap-install
+  cert-manager              cert-manager.tanzu.vmware.com                       1.5.3+tap.2            Reconcile succeeded  tap-install
+  cnrs                      cnrs.tanzu.vmware.com                               1.3.0                  Reconcile succeeded  tap-install
+  contour                   contour.tanzu.vmware.com                            1.18.2+tap.2           Reconcile succeeded  tap-install
+  conventions-controller    controller.conventions.apps.tanzu.vmware.com        0.7.0                  Reconcile succeeded  tap-install
+  developer-conventions     developer-conventions.tanzu.vmware.com              0.7.0                  Reconcile succeeded  tap-install
+  fluxcd-source-controller  fluxcd.source.controller.tanzu.vmware.com           0.16.4                 Reconcile succeeded  tap-install
+  grype                     grype.scanning.apps.tanzu.vmware.com                1.2.3                  Reconcile succeeded  tap-install
+  image-policy-webhook      image-policy-webhook.signing.apps.tanzu.vmware.com  1.1.5                  Reconcile succeeded  tap-install
+  learningcenter            learningcenter.tanzu.vmware.com                     0.2.2                  Reconcile succeeded  tap-install
+  learningcenter-workshops  workshops.learningcenter.tanzu.vmware.com           0.2.2                  Reconcile succeeded  tap-install
+  metadata-store            metadata-store.apps.tanzu.vmware.com                1.2.4                  Reconcile succeeded  tap-install
+  ootb-delivery-basic       ootb-delivery-basic.tanzu.vmware.com                0.8.1                  Reconcile succeeded  tap-install
+  ootb-supply-chain-basic   ootb-supply-chain-basic.tanzu.vmware.com            0.8.1                  Reconcile succeeded  tap-install
+  ootb-templates            ootb-templates.tanzu.vmware.com                     0.8.1                  Reconcile succeeded  tap-install
+  policy-controller         policy.apps.tanzu.vmware.com                        1.0.1                  Reconcile succeeded  tap-install
+  scanning                  scanning.apps.tanzu.vmware.com                      1.2.3                  Reconcile succeeded  tap-install
+  service-bindings          service-bindings.labs.vmware.com                    0.7.2                  Reconcile succeeded  tap-install
+  services-toolkit          services-toolkit.tanzu.vmware.com                   0.7.1                  Reconcile succeeded  tap-install
+  source-controller         controller.source.apps.tanzu.vmware.com             0.4.1                  Reconcile succeeded  tap-install
+  spring-boot-conventions   spring-boot-conventions.tanzu.vmware.com            0.4.1                  Reconcile succeeded  tap-install
+  tap                       tap.tanzu.vmware.com                                1.2.2                  Reconcile succeeded  tap-install
+  tap-auth                  tap-auth.tanzu.vmware.com                           1.0.1                  Reconcile succeeded  tap-install
+  tap-gui                   tap-gui.tanzu.vmware.com                            1.2.5                  Reconcile succeeded  tap-install
+  tap-telemetry             tap-telemetry.tanzu.vmware.com                      0.2.1                  Reconcile succeeded  tap-install
+  tekton-pipelines          tekton.tanzu.vmware.com                             0.33.5                 Reconcile succeeded  tap-install
+  antrea                    antrea.tanzu.vmware.com                             1.5.3+tkg.1-advanced   Reconcile succeeded  tkg-system
+  metrics-server            metrics-server.tanzu.vmware.com                     0.6.1+vmware.1-tkg.1   Reconcile succeeded  tkg-system
+  secretgen-controller      secretgen-controller.tanzu.vmware.com               0.9.1+vmware.1-tkg.1   Reconcile succeeded  tkg-system
+  vsphere-cpi               vsphere-cpi.tanzu.vmware.com                        1.23.1+vmware.1-tkg.1  Reconcile succeeded  tkg-system
+  vsphere-csi               vsphere-csi.tanzu.vmware.com                        2.5.2+vmware.1-tkg.1   Reconcile succeeded  tkg-system
+
+
+  tap-values.yaml
+  tap_gui:
+    service_type: LoadBalancer
+
+ubuntu@jumpbox:~$ kubectl get svc -n tap-gui
+NAME     TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)          AGE
+server   LoadBalancer   100.64.64.3   10.225.59.181   7000:30517/TCP   170m
+
+
+http://EXTERNAL-IP:7000
