@@ -126,11 +126,11 @@ create new project > mitest
 
 ubuntu@jumpbox:~$ docker login registry.tanzu.vmware.com
 Username: jpastrana@pivotal.io
-Password:PaPa0811!
+Password:************
 
 
 export INSTALL_REGISTRY_USERNAME=jairop
-export INSTALL_REGISTRY_PASSWORD='9D4CHd@aQ"):%Xn'
+export INSTALL_REGISTRY_PASSWORD=*************
 export INSTALL_REGISTRY_HOSTNAME=harbor-repo.vmware.com
 export TAP_VERSION=1.2.2
 export INSTALL_REPO=jairotest/repo
