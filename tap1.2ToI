@@ -119,7 +119,7 @@ users:
 Relocate images to a registry:
 ubuntu@jumpbox:~$ docker login demo.goharbor.io
 Username: jairotest
-Password:PaPa0811!
+Password:**********
 
 manually create a new project:
 create new project > mitest
