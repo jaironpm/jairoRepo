@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portfolio</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a24;
+      --accent: #7c6af7;
+      --accent2: #56cfad;
+      --text: #e8e8f0;
+      --muted: #888899;
+      --radius: 12px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: fixed; top: 0; width: 100%;
+      background: rgba(15,15,19,0.85);
+      backdrop-filter: blur(10px);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2rem;
+      z-index: 100;
+      border-bottom: 1px solid rgba(124,106,247,0.15);
+    }
+    nav .logo { font-weight: 700; font-size: 1.2rem; color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 2rem; }
+    nav ul a {
+      color: var(--muted); text-decoration: none; font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    nav ul a:hover { color: var(--text); }
+
+    /* ── Sections ── */
+    section { padding: 6rem 2rem; max-width: 900px; margin: 0 auto; }
+
+    /* ── Hero ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding-top: 5rem;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(124,106,247,0.15);
+      color: var(--accent);
+      font-size: 0.8rem; letter-spacing: 0.1em;
+      padding: 0.3rem 0.8rem; border-radius: 99px;
+      margin-bottom: 1.5rem;
+    }
+    #hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800; line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    #hero h1 span { color: var(--accent); }
+    #hero p { font-size: 1.15rem; color: var(--muted); max-width: 520px; margin-bottom: 2rem; }
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      padding: 0.75rem 1.75rem; border-radius: var(--radius);
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      text-decoration: none; border: none; transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #9585f9; transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Section headings ── */
+    .section-label {
+      font-size: 0.8rem; letter-spacing: 0.12em;
+      color: var(--accent2); text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    h2 { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; }
+
+    /* ── About ── */
+    #about p { color: var(--muted); max-width: 640px; margin-bottom: 1rem; }
+
+    /* ── Skills ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+    }
+    .skill-chip {
+      background: var(--surface);
+      border: 1px solid rgba(124,106,247,0.2);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .skill-chip:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .skill-chip span { display: block; font-size: 1.5rem; margin-bottom: 0.3rem; }
+
+    /* ── Projects ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .card-tag {
+      font-size: 0.75rem; color: var(--accent2);
+      background: rgba(86,207,173,0.1);
+      padding: 0.2rem 0.6rem; border-radius: 99px;
+      display: inline-block; margin-bottom: 0.75rem;
+    }
+    .card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; }
+    .card-links { margin-top: 1rem; display: flex; gap: 0.75rem; }
+    .card-links a {
+      font-size: 0.85rem; color: var(--accent);
+      text-decoration: none;
+    }
+    .card-links a:hover { text-decoration: underline; }
+
+    /* ── Contact ── */
+    #contact p { color: var(--muted); margin-bottom: 2rem; max-width: 480px; }
+    .contact-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 2rem;
+      color: var(--muted); font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ── Scroll fade-in animation ── */
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s, transform 0.6s; }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      nav ul { gap: 1rem; }
+      section { padding: 4rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">yourname.dev</div>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="hero-tag">👋 Available for work</div>
+    <h1>Hi, I'm <span>Your Name</span>.<br/>I build things for the web.</h1>
+    <p>A passionate developer focused on creating clean, performant, and accessible digital experiences.</p>
+    <div class="btn-group">
+      <a href="#projects" class="btn btn-primary">See My Work</a>
+      <a href="#contact" class="btn btn-outline">Get In Touch</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="fade-in">
+    <div class="section-label">About Me</div>
+    <h2>A little about me</h2>
+    <p>I'm a developer who loves turning ideas into real products. I enjoy working across the full stack — from designing intuitive UIs to building robust backend systems.</p>
+    <p>When I'm not coding, you'll find me exploring new technologies, contributing to open source, or hiking with my dog. 🐕</p>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills" class="fade-in">
+    <div class="section-label">What I Know</div>
+    <h2>Skills & Tools</h2>
+    <div class="skills-grid">
+      <div class="skill-chip"><span>🌐</span>HTML/CSS</div>
+      <div class="skill-chip"><span>⚡</span>JavaScript</div>
+      <div class="skill-chip"><span>⚛️</span>React</div>
+      <div class="skill-chip"><span>🐍</span>Python</div>
+      <div class="skill-chip"><span>🗄️</span>SQL</div>
+      <div class="skill-chip"><span>🐙</span>Git/GitHub</div>
+      <div class="skill-chip"><span>🐳</span>Docker</div>
+      <div class="skill-chip"><span>☁️</span>AWS</div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="fade-in">
+    <div class="section-label">My Work</div>
+    <h2>Featured Projects</h2>
+    <div class="projects-grid">
+
+      <div class="card">
+        <span class="card-tag">React · Node.js</span>
+        <h3>Project Alpha</h3>
+        <p>A real-time collaboration tool that lets teams manage tasks and share updates seamlessly.</p>
+        <div class="card-links">
+          <a href="#">GitHub →</a>
+          <a href="#">Live Demo →</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">Python · FastAPI</span>
+        <h3>Project Beta</h3>
+        <p>A REST API service for processing and analysing large datasets with async support.</p>
+        <div class="card-links">
+          <a href="#">GitHub →</a>
+          <a href="#">Docs →</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">HTML · CSS · JS</span>
+        <h3>Project Gamma</h3>
+        <p>A lightweight browser extension that enhances productivity with keyboard shortcuts.</p>
+        <div class="card-links">
+          <a href="#">GitHub →</a>
+          <a href="#">Chrome Store →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="fade-in">
+    <div class="section-label">Get In Touch</div>
+    <h2>Let's work together</h2>
+    <p>Whether you have a project in mind, a question, or just want to say hi — my inbox is always open.</p>
+    <div class="contact-links">
+      <a href="mailto:you@example.com" class="btn btn-primary">✉️ Email Me</a>
+      <a href="https://github.com/" class="btn btn-outline">GitHub</a>
+      <a href="https://linkedin.com/" class="btn btn-outline">LinkedIn</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>Designed & built by Your Name · 2026</p>
+  </footer>
+
+  <script>
+    // Scroll-triggered fade-in animation
+    // Uses IntersectionObserver to watch for elements entering the viewport
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    // Attach observer to every element with the fade-in class
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
